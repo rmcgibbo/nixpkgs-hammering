@@ -22,12 +22,11 @@ fn analyze_single_file(
     for uri in walk_kind(&root, TOKEN_URI) {
         let start = uri.text_range().start().to_usize() as u32;
 
-        report.push(NixpkgsHammerMessage {
-            msg: "URI literals are deprecated.".to_string(),
-            name: "no-uri-literals",
-            locations: vec![SourceLocation::from_byte_index(files, file_id, start)?],
-            link: true,
-        });
+        report.push(NixpkgsHammerMessage::new(
+            "no-uri-literals",
+            "URI literals are deprecated.",
+            vec![SourceLocation::from_byte_index(files, file_id, start)?],
+        ));
     }
 
     Ok(report)

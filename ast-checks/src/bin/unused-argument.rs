@@ -38,7 +38,7 @@ fn analyze_single_file(files: &Files<String>, file_id: FileId) -> Result<Report,
         };
 
         let unused_formal_parameters = formal_parameter_pattern_args
-            .iter()            
+            .iter()
             // Don't consider parameters that appear as identifiers in the function
             // body
             .filter(|formal| {
@@ -49,12 +49,11 @@ fn analyze_single_file(files: &Files<String>, file_id: FileId) -> Result<Report,
 
         for unused in unused_formal_parameters {
             let start = unused.node().text_range().start().to_usize() as u32;
-            report.push(NixpkgsHammerMessage {
-                msg: format!("Unused argument: `{}`.", unused.node()),
-                name: "unused-argument",
-                locations: vec![SourceLocation::from_byte_index(files, file_id, start)?],
-                link: false,
-            });
+            report.push(NixpkgsHammerMessage::new(
+                "unused-argument",
+                &format!("Unused argument: `{}`.", unused.node()),
+                vec![SourceLocation::from_byte_index(files, file_id, start)?],
+            ).with_link(false));
         }
     }
 

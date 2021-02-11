@@ -32,8 +32,28 @@ impl SourceLocation {
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct NixpkgsHammerMessage {
-    pub locations: Vec<SourceLocation>,
-    pub msg: String,
-    pub name: &'static str,
-    pub link: bool,
+    name: String,
+    msg: String,
+    locations: Vec<SourceLocation>,
+    link: bool,
+}
+
+impl NixpkgsHammerMessage {
+    pub fn new<S>(name: S, msg: S, locations: Vec<SourceLocation>) -> NixpkgsHammerMessage
+    where
+        S: Into<String>,
+    {
+        NixpkgsHammerMessage {
+            name: name.into(),
+            msg: msg.into(),
+            locations: locations,
+            link: true,
+        }
+    }
+
+    /// Add an argument to pass to the program.
+    pub fn with_link(&mut self, link: bool) -> &mut NixpkgsHammerMessage {
+        self.link = link;
+        self
+    }
 }

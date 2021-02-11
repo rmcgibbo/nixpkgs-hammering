@@ -55,24 +55,22 @@ fn process_patch_list(
                 if !(has_comment_above || has_comment_within) {
                     let start = item.text_range().start().to_usize() as u32;
 
-                    report.push(NixpkgsHammerMessage {
-                        msg: "Please add a comment on the line above, explaining the purpose of this patch.".to_string(),
-                        name: "missing-patch-comment",
-                        locations: vec![SourceLocation::from_byte_index(files, file_id, start)?],
-                        link: true,
-                    });
-                }
+                    report.push(NixpkgsHammerMessage::new(
+                        "missing-patch-comment",
+                        "Please add a comment on the line above, explaining the purpose of this patch.",
+                        vec![SourceLocation::from_byte_index(files, file_id, start)?]
+                    ));
+            }
             }
         }
         None => {
             let start = kv.node().text_range().start().to_usize() as u32;
 
-            report.push(NixpkgsHammerMessage {
-                msg: "`patches` should be a list.".to_string(),
-                name: "missing-patch-comment",
-                locations: vec![SourceLocation::from_byte_index(files, file_id, start)?],
-                link: true,
-            });
+            report.push(NixpkgsHammerMessage::new(
+                "missing-patch-comment",
+                "`patches` should be a list.",
+                vec![SourceLocation::from_byte_index(files, file_id, start)?],
+            ));
         }
     };
 
