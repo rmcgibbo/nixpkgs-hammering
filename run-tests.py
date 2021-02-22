@@ -232,6 +232,17 @@ class TestSuite(unittest.TestSuite):
         )
 
         yield make_test_rule(
+            'no-python-tests',
+            [
+                'no-tests',
+            ],
+            [
+                'pytest',
+            ],
+            True
+        )
+
+        yield make_test_rule(
             'patch-phase'
         )
 
