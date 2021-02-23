@@ -25,7 +25,7 @@ let
     "breakpointHook"
     "bzip2"
     "bundler"
-    # "darwin.cctools"
+    "darwin.cctools"
     "cmake"
     "docutils"
     "dos2unix"
@@ -67,15 +67,15 @@ let
     "maven"
     "meson"
     "ninja"
-    #"nodePackages.node-gyp"
-    #"nodePackages.node-gyp-build"
-    #"nodePackages.node-pre-gyp"
+    "nodePackages.node-gyp"
+    "nodePackages.node-gyp-build"
+    "nodePackages.node-pre-gyp"
     "pandoc"
     "patch"
     "patchelf"
     "pkg-config"
     "poetry"
-    #"pythonPackages.pytest"
+    "pythonPackages.pytest"
     "qmake4Hook"
     "wrapQtAppsHook"
     "ronn"
@@ -83,10 +83,10 @@ let
     "rpm"
     "rpmextract"
     "rsync"
-    #"pythonPackages.setuptools-git"
-    #"pythonPackages.setuptools_scm"
-    #"pythonPackages.setuptools-scm-git-archive"
-    #"pythonPackages.sphinx"
+    "pythonPackages.setuptools-git"
+    "pythonPackages.setuptools-scm"
+    "pythonPackages.setuptools-scm-git-archive"
+    "pythonPackages.sphinx"
     "squashfsTools"
     "sudo"
     "subversion"
@@ -98,8 +98,8 @@ let
     "wafHook"
     "which"
     "wrapGAppsHook"
-    #"pythonPackages.wrapPython"
-    #"qt5.wrapQtAppsHook"
+    "pythonPackages.wrapPython"
+    "qt5.wrapQtAppsHook"
     "xcbuildHook"
     "xcodebuild"
     "xmlto"
@@ -113,7 +113,7 @@ let
     (map
       (tool: {
         name = "build-tools-in-build-inputs";
-        cond = lib.elem prev.${tool} (drvArgs.buildInputs or [ ]);
+        cond = lib.elem (lib.attrByPath (lib.splitString "." tool) (throw "‘${tool}’ does not exist in Nixpkgs.")) (drvArgs.buildInputs or [ ]);
         msg = ''
           ${tool} is a build tool so it likely goes to `nativeBuildInputs`, not `buildInputs`.
         '';
