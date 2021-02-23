@@ -6,6 +6,7 @@ import json
 import os
 import subprocess
 import sys
+import tempfile
 import textwrap
 from collections import defaultdict
 from dataclasses import asdict, dataclass, field, is_dataclass
@@ -135,12 +136,26 @@ def escape_nix_string(val: str) -> str:
 
 
 def nix_eval_json(expr: str, show_trace: bool = False) -> Dict[Attr, List[Report]]:
-    args = ["nix-instantiate", "--strict", "--json", "--eval", "-"]
+    args = [
+        "nix-instantiate", "--strict", "--json",
+        "--eval", "-"
+    ]
+    if "NIX_PLUGINS" in os.environ:
+        args.extend(["--option", "plugin-files"] + os.environ["NIX_PLUGINS"].split(":"))
 
     if show_trace:
         args.append("--show-trace")
 
-    json_text = subprocess.check_output(args, text=True, input=expr)
+    with tempfile.TemporaryFile() as f:
+        json_text = subprocess.check_output(
+            args,
+            text=True,
+            input=expr.replace(r"%FD%", f"{f.fileno()}"),
+            pass_fds=(f.fileno(),),
+        )
+        f.seek(0)
+        all_urls = f.read().decode("utf-8")
+        print(all_urls)
 
     def maybe_path(s: Optional[str]) -> Optional[Path]:
         if s:
@@ -291,6 +306,18 @@ def main(args):
             """
             )
         )
+
+    overlay_expressions.append(textwrap.dedent(
+    f"""
+    (self: super: {{
+      fetchurl = let
+        originalOutput = args: builtins.traceFd %FD% (builtins.toJSON args) (super.fetchurl args);
+      in
+        originalOutput;
+    }})
+    """
+))
+
 
     name_positions_nix = (
         "[\n" + indent("\n".join(name_positions)) + "\n]" if name_positions else "[ ]"
